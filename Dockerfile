@@ -1,14 +1,23 @@
-# Use a lightweight base image
-FROM openjdk:17-jdk-slim
+# Build stage
+FROM maven:3.9.6-amazoncorretto-21 AS build
 
-# Set the working directory
 WORKDIR /app
 
-# Copy the built JAR file
-COPY target/*.jar app.jar
+COPY pom.xml .
+RUN mvn dependency:go-offline
 
-# Expose the service port (e.g., Eureka default port 8761, or your configured port)
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Runtime stage
+FROM eclipse-temurin:21-jre-jammy
+
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar app.jar
+
 EXPOSE 8761
 
-# Start the application
+ENV JAVA_TOOL_OPTIONS="-Xms256m -Xmx512m"
+
 ENTRYPOINT ["java", "-jar", "app.jar"]

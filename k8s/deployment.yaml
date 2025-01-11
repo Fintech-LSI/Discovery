@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: discovery-service
-  namespace: discovery
+  name: discovery-service-deploy
+  namespace: fintech
 spec:
-  replicas: 1
+  replicas: 1  # Only one replica as it's a singleton service
   selector:
     matchLabels:
       app: discovery-service
@@ -15,13 +15,19 @@ spec:
     spec:
       containers:
         - name: discovery-service
-          image: ${process.env.ECR_REPO}/discovery-service:latest
+          image: public.ecr.aws/z1z0w2y6/discovery-service:latest
           ports:
             - containerPort: 8761
+          envFrom:
+            - configMapRef:
+                name: discovery-service-config
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
           resources:
             requests:
               memory: "512Mi"
-              cpu: "250m"
+              cpu: "200m"
             limits:
               memory: "1Gi"
               cpu: "500m"
@@ -31,9 +37,9 @@ spec:
               port: 8761
             initialDelaySeconds: 30
             periodSeconds: 10
-          env:
-            - name: SPRING_PROFILES_ACTIVE
-              valueFrom:
-                configMapKeyRef:
-                  name: discovery-config
-                  key: spring.profiles.active
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8761
+            initialDelaySeconds: 60
+            periodSeconds: 15

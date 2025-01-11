@@ -1,16 +1,24 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: discovery-config
-  namespace: discovery
+  name: discovery-service-config
+  namespace: fintech
 data:
-  spring.profiles.active: "prod"
-  application.yml: |
+  application.yml: |-
+    spring:
+      application:
+        name: discovery-service
+      config:
+        import: optional:configserver:http://config-server.fintech.svc.cluster.local:8889
+    
     server:
       port: 8761
+    
     eureka:
+      instance:
+        hostname: discovery-service.fintech.svc.cluster.local
       client:
-        registerWithEureka: false
-        fetchRegistry: false
-      server:
-        waitTimeInMsWhenSyncEmpty: 0
+        register-with-eureka: false
+        fetch-registry: false
+        service-url:
+          defaultZone: http://discovery-service.fintech.svc.cluster.local:8761/eureka/
