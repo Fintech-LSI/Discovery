@@ -4,7 +4,7 @@ metadata:
   name: discovery-service-deploy
   namespace: fintech
 spec:
-  replicas: 1  # Only one replica as it's a singleton service
+  replicas: 1
   selector:
     matchLabels:
       app: discovery-service
@@ -18,9 +18,6 @@ spec:
           image: public.ecr.aws/z1z0w2y6/discovery-service:latest
           ports:
             - containerPort: 8761
-          envFrom:
-            - configMapRef:
-                name: discovery-service-config
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "prod"
@@ -35,11 +32,13 @@ spec:
             httpGet:
               path: /actuator/health
               port: 8761
-            initialDelaySeconds: 30
+            initialDelaySeconds: 90
             periodSeconds: 10
+            failureThreshold: 3
           livenessProbe:
             httpGet:
               path: /actuator/health
               port: 8761
-            initialDelaySeconds: 60
+            initialDelaySeconds: 90
             periodSeconds: 15
+            failureThreshold: 3
