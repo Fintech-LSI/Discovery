@@ -20,7 +20,7 @@ spec:
             - containerPort: 8761
           env:
             - name: SPRING_PROFILES_ACTIVE
-              value: "prod"
+              value: "native"
           resources:
             requests:
               memory: "512Mi"
