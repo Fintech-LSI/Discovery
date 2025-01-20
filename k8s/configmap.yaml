@@ -9,16 +9,7 @@ data:
       application:
         name: discovery-service
       config:
-        import: optional:configserver:http://10.0.0.7:8889
+        import: optional:configserver:http://config-service:8889
     
     server:
       port: 8761
-    
-    eureka:
-      instance:
-        hostname: discovery-service.fintech.svc.cluster.local
-      client:
-        register-with-eureka: false
-        fetch-registry: false
-        service-url:
-          defaultZone: http://10.0.1.37:8761/eureka/

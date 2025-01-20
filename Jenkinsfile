@@ -8,14 +8,43 @@ pipeline {
         DOCKER_BUILD_NUMBER = "${BUILD_NUMBER}"
         EKS_CLUSTER_NAME = 'main-cluster'
         NAMESPACE = 'fintech'
+        SONAR_PROJECT_KEY = 'your-project-key'
+        SONAR_SERVER_URL = 'http://your-sonarqube-ec2-instance:9000'
     }
 
-    stages {
+    /*stages {
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_TOKEN')]) {
+                        try {
+                            sh """
+                                mvn sonar:sonar \
+                                    -Dsonar.host.url=${SONAR_HOST_URL} \
+                                    -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                                    -Dsonar.login=${SONAR_TOKEN}
+                            """
+                        } catch (Exception e) {
+                            error "SonarQube analysis failed: ${e.message}"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }*/
 
         stage('Build') {
             steps {
